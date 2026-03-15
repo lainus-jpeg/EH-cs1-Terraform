@@ -275,6 +275,45 @@ resource "aws_iam_role_policy" "github_ecr_push" {
   })
 }
 
+# Policy for GitHub Actions to manage Terraform state
+resource "aws_iam_role_policy" "github_terraform_state" {
+  name = "github-actions-terraform-state-policy"
+  role = aws_iam_role.github_actions.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "s3:ListBucket",
+          "s3:GetBucketVersioning"
+        ]
+        Resource = "arn:aws:s3:::eh-cs1-terraform-state-*"
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "s3:GetObject",
+          "s3:PutObject",
+          "s3:DeleteObject"
+        ]
+        Resource = "arn:aws:s3:::eh-cs1-terraform-state-*/*"
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "dynamodb:PutItem",
+          "dynamodb:GetItem",
+          "dynamodb:DeleteItem",
+          "dynamodb:DescribeTable"
+        ]
+        Resource = "arn:aws:dynamodb:${var.aws_region}:${data.aws_caller_identity.current.account_id}:table/terraform-locks"
+      }
+    ]
+  })
+}
+
 # IAM Role for EC2 to pull from ECR
 resource "aws_iam_role" "ec2_ecr_pull" {
   name = "ec2-ecr-pull"
