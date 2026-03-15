@@ -7,6 +7,7 @@ on:
     paths:
       - '**.tf'
       - 'terraform.tfvars'
+      - '**.sh'
       - '.github/workflows/terraform-*.yml'
 
 permissions:
