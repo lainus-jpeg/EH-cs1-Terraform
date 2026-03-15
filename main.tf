@@ -142,8 +142,8 @@ module "rds" {
   backup_window           = "03:00-04:00"
   maintenance_window      = "mon:04:00-mon:05:00"
   
-  skip_final_snapshot     = false
-  final_snapshot_identifier = "apps-postgres-final-snapshot-${formatdate("YYYY-MM-DD-hhmm", timestamp())}"
+  skip_final_snapshot     = true
+  final_snapshot_identifier = null
 
   environment = var.environment
 }
