@@ -35,33 +35,18 @@ mkdir -p /etc/grafana/provisioning/datasources
 mkdir -p /etc/grafana/provisioning/dashboards
 
 # Create Prometheus datasource configuration
-cat > /etc/grafana/provisioning/datasources/prometheus.yml << 'EOF'
+cat > /etc/grafana/provisioning/datasources/prometheus.yml << EOF
 apiVersion: 1
-
 datasources:
   - name: Prometheus
     type: prometheus
     access: proxy
     url: http://${prometheus_ip}:9090
+    isDefault: true
+    editable: true
     jsonData:
       timeInterval: 10s
-    editable: true
-    isDefault: true
-    testData:
-      enabled: false
 EOF
-
-# Also ensure the file is created with proper syntax
-cat > /etc/grafana/provisioning/datasources/prometheus.yml << 'EODF'
-apiVersion: 1
-datasources:
-  - name: Prometheus
-    type: prometheus
-    access: proxy
-    url: http://${prometheus_ip}:9090
-    isDefault: true
-    editable: true
-EODF
 
 # Create dashboard provisioning config
 cat > /etc/grafana/provisioning/dashboards/dashboards.yml << 'EOF'
