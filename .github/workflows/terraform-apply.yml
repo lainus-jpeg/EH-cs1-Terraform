@@ -33,6 +33,9 @@ jobs:
           role-to-assume: ${{ secrets.AWS_GITHUB_OIDC_ROLE_ARN }}
           aws-region: ${{ env.AWS_REGION }}
 
+      - name: Verify AWS Identity
+        run: aws sts get-caller-identity
+
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v2
         with:
@@ -53,17 +56,21 @@ jobs:
         continue-on-error: true
 
       - name: Terraform Apply
+        id: apply
         if: steps.plan.outcome == 'success'
         run: terraform apply -auto-approve tfplan
         working-directory: ${{ env.WORKING_DIR }}
+        continue-on-error: true
 
       - name: Get Outputs
-        if: steps.plan.outcome == 'success'
+        if: steps.apply.outcome == 'success'
         id: outputs
         run: |
-          terraform output -json > outputs.json
+          terraform output -json > outputs.json 2>/dev/null || echo '{}' > outputs.json
+          echo "Outputs saved:"
           cat outputs.json
         working-directory: ${{ env.WORKING_DIR }}
+        continue-on-error: true
 
       - name: Create Action Summary
         if: always()
@@ -74,10 +81,12 @@ jobs:
           echo "- Plan: ${{ steps.plan.outcome }}" >> $GITHUB_STEP_SUMMARY
           echo "- Apply: ${{ steps.apply.outcome }}" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "### Key Outputs" >> $GITHUB_STEP_SUMMARY
-          echo "\`\`\`json" >> $GITHUB_STEP_SUMMARY
-          cat outputs.json >> $GITHUB_STEP_SUMMARY
-          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+          if [ -f outputs.json ]; then
+            echo "### Key Outputs" >> $GITHUB_STEP_SUMMARY
+            echo "\`\`\`json" >> $GITHUB_STEP_SUMMARY
+            cat outputs.json >> $GITHUB_STEP_SUMMARY
+            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+          fi
 
       - name: Upload State Backup
         if: always()
