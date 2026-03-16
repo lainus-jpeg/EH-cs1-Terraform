@@ -231,7 +231,8 @@ resource "aws_iam_role" "github_actions" {
               "repo:lainus-jpeg/EH-cs1-api:ref:refs/heads/main",
               "repo:lainus-jpeg/EH-cs1-api:ref:refs/heads/develop",
               "repo:lainus-jpeg/EH-cs1-frontend:ref:refs/heads/main",
-              "repo:lainus-jpeg/EH-cs1-frontend:ref:refs/heads/develop"
+              "repo:lainus-jpeg/EH-cs1-frontend:ref:refs/heads/develop",
+              "repo:lainus-jpeg/EH-cs1-Terraform:ref:refs/heads/main"
             ]
           }
         }
