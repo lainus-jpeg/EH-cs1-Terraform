@@ -8,6 +8,13 @@
 crash.log
 crash.*.log
 
+# Private Keys & Secrets
+*.pem
+*.key
+*.pub
+private-key*
+monitoring-key*
+
 # IDE
 .vscode/
 .idea/

@@ -98,15 +98,25 @@ See [CI-CD-SETUP.md](./CI-CD-SETUP.md) and [GITHUB_ACTIONS_SETUP.md](./GITHUB_AC
 ## Access Points
 
 ### Monitoring
-- **Prometheus**: http://<monitoring-public-ip>:9090
-- **Grafana**: http://<grafana-public-ip>:3000
-  - Default login: admin/admin
+- **Prometheus**: `http://<monitoring-public-ip>:9090`
+  - Example: `http://3.123.45.67:9090`
+- **Grafana**: `http://<monitoring-public-ip>:3000`
+  - Example: `http://3.123.45.67:3000`
+  - Default login: `admin/admin` (change after first login)
   - Datasource: Prometheus (auto-provisioned)
   - Dashboard: Node Exporter Full Dashboard (auto-provisioned)
 
 ### Application
-- **Frontend**: http://<alb-dns-name>/
-- **API**: http://<alb-dns-name>/api/
+- **Frontend**: `http://<alb-dns-name>/`
+  - Example: `http://apps-alb-1234567890.eu-central-1.elb.amazonaws.com/`
+- **API**: `http://<alb-dns-name>/api/`
+  - Example: `http://apps-alb-1234567890.eu-central-1.elb.amazonaws.com/api/`
+
+**Get these values from Terraform outputs:**
+```bash
+terraform output monitoring_public_ip
+terraform output alb_dns_name
+```
 
 ## Alert Rules
 
