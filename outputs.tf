@@ -214,3 +214,34 @@ output "soar_waf_web_acl_id" {
   description = "WAFv2 Web ACL ID protecting ALB"
   value       = aws_wafv2_web_acl.alb_waf.id
 }
+
+# S3 CI/CD Bucket Outputs
+output "cicd_bucket_name" {
+  description = "Name of the S3 bucket for CI/CD artifacts"
+  value       = module.s3.cicd_bucket_name
+}
+
+output "cicd_bucket_arn" {
+  description = "ARN of the S3 bucket for CI/CD artifacts"
+  value       = module.s3.cicd_bucket_arn
+}
+
+output "cicd_bucket_region" {
+  description = "Region of the S3 bucket for CI/CD artifacts"
+  value       = module.s3.cicd_bucket_region
+}
+
+output "cicd_logs_bucket_name" {
+  description = "Name of the S3 bucket for CI/CD access logs"
+  value       = module.s3.cicd_logs_bucket_name
+}
+
+output "cicd_logs_bucket_arn" {
+  description = "ARN of the S3 bucket for CI/CD access logs"
+  value       = module.s3.cicd_logs_bucket_arn
+}
+
+output "s3_bucket_usage_guide" {
+  description = "Usage guide for S3 buckets in CI/CD pipeline"
+  value       = "GitHub Actions can push artifacts to s3://${module.s3.cicd_bucket_name}/. EC2 instances can pull artifacts from this bucket using IAM role permissions."
+}

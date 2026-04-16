@@ -227,3 +227,78 @@ docker run -e MY_VAR="$VAR" ...
 3. Create Parameter Store `/apps/database-url`
 4. Push code to main branch
 5. Monitor first deployment in GitHub Actions
+
+
+## S3 Artifacts Bucket
+
+The Terraform configuration includes an S3 bucket for storing CI/CD artifacts and build outputs.
+
+### Bucket Details
+
+- **Bucket Name**: `<project-name>-dev-cicd-<account-id>`
+- **Access**: 
+  - GitHub Actions: Full read/write/delete access
+  - EC2 Instances: Read-only access
+- **Features**:
+  - ✅ Versioning enabled for rollback
+  - ✅ Encryption enabled (AES256)
+  - ✅ Access logging to separate bucket
+  - ✅ Automatic cleanup of old versions (30 days → Glacier, 90 days → delete)
+
+### Using S3 in GitHub Actions
+
+Add to your workflow to store artifacts:
+
+```yaml
+- name: Upload to S3
+  run: |
+    aws s3 cp build/ s3://${{ secrets.S3_BUCKET_NAME }}/frontend-build-${{ github.sha }}/ \
+      --recursive \
+      --region eu-central-1
+  env:
+    AWS_ROLE_ARN: ${{ secrets.AWS_GITHUB_OIDC_ROLE_ARN }}
+    AWS_WEB_IDENTITY_TOKEN_FILE: /tmp/awscreds
+    AWS_REGION: eu-central-1
+```
+
+### Using S3 on EC2 Instances
+
+EC2 instances have IAM permissions to read from the S3 bucket:
+
+```bash
+# List artifacts
+aws s3 ls s3://monitoring-apps-dev-cicd-<account-id>/ --region eu-central-1
+
+# Download build artifacts
+aws s3 cp s3://monitoring-apps-dev-cicd-<account-id>/frontend-build-<sha>/ ./build/ \
+  --recursive \
+  --region eu-central-1
+```
+
+### Getting Bucket Details from Terraform
+
+After deployment, get S3 bucket information:
+
+```bash
+cd z:\Semester 3\github rep case1\infra\terraform\v4\dev
+
+# Get bucket name
+terraform output cicd_bucket_name
+
+# Get all S3-related outputs
+terraform output | grep s3
+```
+
+### Cost Optimization
+
+- **Versioning**: Old versions transition to Glacier after 30 days (cheaper storage)
+- **Logs**: Access logs automatically deleted after 90 days
+- **Estimated Cost**: ~$0.50-2/month depending on usage
+
+### Security
+
+- ✅ All public access blocked
+- ✅ Encryption at rest (AES256)
+- ✅ Bucket policy enforces IAM role-based access
+- ✅ Versioning prevents accidental overwrites
+- ✅ Access logging to separate bucket for audit trail
